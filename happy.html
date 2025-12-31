@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Năm mới 2026</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 80px;
+        }
+
+        #now {
+            font-size: 26px;
+            margin-bottom: 15px;
+        }
+
+        #countdown {
+            font-size: 40px;
+            color: gold;
+        }
+
+        #message {
+            display: none;
+        }
+
+        #fade-text {
+            font-size: 38px;
+            color: gold;
+            opacity: 1;
+            transition: opacity 1.5s ease-in-out;
+            margin-top: 30px;
+        }
+
+        #name {
+            font-size: 26px;
+            margin-top: 25px;
+            color: #ccc;
+        }
+
+        #ended {
+            display: none;
+            font-size: 30px;
+            color: gray;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TRƯỚC 0H -->
+    <div id="now"></div>
+    <div id="countdown"></div>
+
+    <!-- LỜI CHÚC (01/01 → 03/01) -->
+    <div id="message">
+        <div id="fade-text"></div>
+        <div id="name">— Nguyễn Minh Quang —</div>
+    </div>
+
+    <!-- SAU 03/01 -->
+    <div id="ended">Sự kiện đã kết thúc</div>
+
+    <script>
+        /* ====== MỐC THỜI GIAN ====== */
+        const startNewYear = new Date("2026-01-01T00:00:00");
+        const endNewYear   = new Date("2026-01-04T00:00:00");
+
+        /* ====== ✏️ ĐIỀN CÂU CHÚC Ở ĐÂY ====== */
+        const wishes = [
+            "🎉 CHÚC MỪNG NĂM MỚI 2026 🎉",
+            "👉 ĐIỀN CÂU CHÚC CỦA BẠN Ở ĐÂY",
+            "👉 BẠN CÓ THỂ THÊM BAO NHIÊU DÒNG CŨNG ĐƯỢC",
+            "Chúc sức khỏe – học giỏi – code không bug 😆"
+        ];
+        /* ====== HẾT PHẦN ĐIỀN CÂU CHÚC ====== */
+
+        let wishIndex = 0;
+        let wishTimer = null;
+
+        function startWishAnimation() {
+            const text = document.getElementById("fade-text");
+            text.innerText = wishes[wishIndex];
+
+            wishTimer = setInterval(() => {
+                text.style.opacity = 0;
+
+                setTimeout(() => {
+                    wishIndex = (wishIndex + 1) % wishes.length;
+                    text.innerText = wishes[wishIndex];
+                    text.style.opacity = 1;
+                }, 1500);
+
+            }, 4000);
+        }
+
+        function update() {
+            const now = new Date();
+
+            /* SAU 03/01 → DỪNG */
+            if (now >= endNewYear) {
+                document.getElementById("now").style.display = "none";
+                document.getElementById("countdown").style.display = "none";
+                document.getElementById("message").style.display = "none";
+                document.getElementById("ended").style.display = "block";
+                if (wishTimer) clearInterval(wishTimer);
+                return;
+            }
+
+            /* TỪ 0H 01/01 → 03/01 */
+            if (now >= startNewYear) {
+                document.getElementById("now").style.display = "none";
+                document.getElementById("countdown").style.display = "none";
+                document.getElementById("message").style.display = "block";
+                if (!wishTimer) startWishAnimation();
+                return;
+            }
+
+            /* TRƯỚC 0H → ĐẾM NGƯỢC */
+            document.getElementById("now").innerText =
+                "Bây giờ là: " +
+                now.toLocaleTimeString() +
+                " | " +
+                now.toLocaleDateString();
+
+            const diff = startNewYear - now;
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+
+            document.getElementById("countdown").innerText =
+                `${h} giờ ${m} phút ${s} giây`;
+        }
+
+        setInterval(update, 1000);
+        update();
+    </script>
+
+</body>
+</html>
