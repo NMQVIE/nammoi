@@ -1,146 +1,374 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Năm mới 2026</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy New Year</title>
 
-    <style>
-        body {
-            margin: 0;
-            background: black;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 80px;
-        }
+<style>
+    body {
+        margin: 0;
+        background: black;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding-top: 80px;
+    }
 
-        #now {
-            font-size: 26px;
-            margin-bottom: 15px;
-        }
+    button {
+        font-size: 20px;
+        padding: 12px 24px;
+        cursor: pointer;
+    }
 
-        #countdown {
-            font-size: 40px;
-            color: gold;
-        }
+    #now {
+        font-size: 24px;
+        margin-top: 20px;
+    }
 
-        #message {
-            display: none;
-        }
+    #countdown {
+        font-size: 38px;
+        color: gold;
+        margin-top: 10px;
+    }
 
-        #fade-text {
-            font-size: 38px;
-            color: gold;
-            opacity: 1;
-            transition: opacity 1.5s ease-in-out;
-            margin-top: 30px;
-        }
+    #fade-text {
+        font-size: 36px;
+        color: gold;
+        opacity: 1;
+        transition: opacity 1.5s;
+        margin-top: 40px;
+    }
 
-        #name {
-            font-size: 26px;
-            margin-top: 25px;
-            color: #ccc;
-        }
+    #name {
+        margin-top: 20px;
+        font-size: 24px;
+        color: #ccc;
+    }
 
-        #ended {
-            display: none;
-            font-size: 30px;
-            color: gray;
-            margin-top: 40px;
-        }
-    </style>
+    #ended {
+        display: none;
+        font-size: 28px;
+        color: gray;
+        margin-top: 40px;
+    }
+</style>
 </head>
 
 <body>
 
-    <!-- TRƯỚC 0H -->
-    <div id="now"></div>
-    <div id="countdown"></div>
+<!-- 🔊 NHẠC -->
+<audio id="music-before" src="before.mp3" loop></audio>
+<audio id="music-after" src="after.mp3" loop></audio>
 
-    <!-- LỜI CHÚC (01/01 → 03/01) -->
-    <div id="message">
-        <div id="fade-text"></div>
-        <div id="name">— Nguyễn Minh Quang —</div>
-    </div>
+<!-- ▶ NÚT BẮT ĐẦU -->
+<button id="startBtn">▶ Bắt đầu</button>
 
-    <!-- SAU 03/01 -->
-    <div id="ended">Sự kiện đã kết thúc</div>
+<div id="fade-text"></div>
+<div id="name">— Nguyễn Minh Quang —</div>
 
-    <script>
-        /* ====== MỐC THỜI GIAN ====== */
-        const startNewYear = new Date("2026-01-01T00:00:00");
-        const endNewYear   = new Date("2026-01-04T00:00:00");
+<div id="now"></div>
+<div id="countdown"></div>
 
-        /* ====== ✏️ ĐIỀN CÂU CHÚC Ở ĐÂY ====== */
-        const wishes = [
-            "🎉 CHÚC MỪNG NĂM MỚI 2026 🎉",
-            "👉 ĐIỀN CÂU CHÚC CỦA BẠN Ở ĐÂY",
-            "👉 BẠN CÓ THỂ THÊM BAO NHIÊU DÒNG CŨNG ĐƯỢC",
-            "Chúc sức khỏe – học giỏi – code không bug 😆"
-        ];
-        /* ====== HẾT PHẦN ĐIỀN CÂU CHÚC ====== */
+<div id="ended">Sự kiện đã kết thúc</div>
 
-        let wishIndex = 0;
-        let wishTimer = null;
+<script>
+/* ⏰ MỐC THỜI GIAN */
+const startNewYear = new Date("2026-01-01T00:00:00");
+const endNewYear   = new Date("2026-01-04T00:00:00");
 
-        function startWishAnimation() {
-            const text = document.getElementById("fade-text");
-            text.innerText = wishes[wishIndex];
+/* ✏️ CÂU CHÚC TRƯỚC 0H (SỬA Ở ĐÂY) */
+const beforeWishes = [
+    "Chỉ còn ít giờ nữa thôi năm mới sẽ đến",
+    "Mong bạn bỏ lại mọi muộn phiền ở năm cũ",
+    "Và sẵn sàng bùng nổ trong năm 2026",
+    "Chúc bạn luôn mạnh khỏe và vui vẻ 😄"
+];
 
-            wishTimer = setInterval(() => {
-                text.style.opacity = 0;
+/* ✏️ CÂU CHÚC SAU 0H (SỬA Ở ĐÂY) */
+const afterWishes = [
+    "🎉 CHÚC MỪNG NĂM MỚI 2026 🎉",
+    "Chúc bạn thật nhiều may mắn",
+    "Học tập – công việc đều thuận lợi",
+    "Mọi ước mơ sớm thành hiện thực ✨"
+];
 
-                setTimeout(() => {
-                    wishIndex = (wishIndex + 1) % wishes.length;
-                    text.innerText = wishes[wishIndex];
-                    text.style.opacity = 1;
-                }, 1500);
+let currentWishes = beforeWishes;
+let wishIndex = 0;
+let wishTimer = null;
+let started = false;
 
-            }, 4000);
+const musicBefore = document.getElementById("music-before");
+const musicAfter  = document.getElementById("music-after");
+
+
+document.getElementById("startBtn").onclick = () => {
+    started = true;
+    document.getElementById("startBtn").style.display = "none";
+    update();
+};
+
+
+function startWishAnimation() {
+    const text = document.getElementById("fade-text");
+    text.innerText = currentWishes[wishIndex];
+
+    if (wishTimer) clearInterval(wishTimer);
+
+    wishTimer = setInterval(() => {
+        text.style.opacity = 0;
+        setTimeout(() => {
+            wishIndex = (wishIndex + 1) % currentWishes.length;
+            text.innerText = currentWishes[wishIndex];
+            text.style.opacity = 1;
+        }, 1500);
+    }, 4000);
+}
+
+
+function update() {
+    if (!started) return;
+
+    const now = new Date();
+
+
+    if (now >= endNewYear) {
+        musicBefore.pause();
+        musicAfter.pause();
+        document.getElementById("now").style.display = "none";
+        document.getElementById("countdown").style.display = "none";
+        document.getElementById("fade-text").innerText = "";
+        document.getElementById("ended").style.display = "block";
+        if (wishTimer) clearInterval(wishTimer);
+        return;
+    }
+
+
+    if (now >= startNewYear) {
+        musicBefore.pause();
+        musicAfter.play().catch(()=>{});
+
+        if (currentWishes !== afterWishes) {
+            currentWishes = afterWishes;
+            wishIndex = 0;
+            startWishAnimation();
         }
 
-        function update() {
-            const now = new Date();
+        document.getElementById("now").style.display = "none";
+        document.getElementById("countdown").style.display = "none";
+        return;
+    }
 
-            /* SAU 03/01 → DỪNG */
-            if (now >= endNewYear) {
-                document.getElementById("now").style.display = "none";
-                document.getElementById("countdown").style.display = "none";
-                document.getElementById("message").style.display = "none";
-                document.getElementById("ended").style.display = "block";
-                if (wishTimer) clearInterval(wishTimer);
-                return;
-            }
 
-            /* TỪ 0H 01/01 → 03/01 */
-            if (now >= startNewYear) {
-                document.getElementById("now").style.display = "none";
-                document.getElementById("countdown").style.display = "none";
-                document.getElementById("message").style.display = "block";
-                if (!wishTimer) startWishAnimation();
-                return;
-            }
+    musicAfter.pause();
+    musicBefore.play().catch(()=>{});
 
-            /* TRƯỚC 0H → ĐẾM NGƯỢC */
-            document.getElementById("now").innerText =
-                "Bây giờ là: " +
-                now.toLocaleTimeString() +
-                " | " +
-                now.toLocaleDateString();
+    document.getElementById("now").innerText =
+        "Bây giờ là: " +
+        now.toLocaleTimeString("vi-VN") +
+        " | " +
+        now.toLocaleDateString("vi-VN");
 
-            const diff = startNewYear - now;
-            const h = Math.floor(diff / (1000 * 60 * 60));
-            const m = Math.floor((diff / (1000 * 60)) % 60);
-            const s = Math.floor((diff / 1000) % 60);
+    const diff = startNewYear - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
 
-            document.getElementById("countdown").innerText =
-                `${h} giờ ${m} phút ${s} giây`;
+    document.getElementById("countdown").innerText =
+        `${h} giờ ${m} phút ${s} giây`;
+
+    if (!wishTimer) startWishAnimation();
+}
+
+setInterval(update, 1000);
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy New Year</title>
+
+<style>
+    body {
+        margin: 0;
+        background: black;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding-top: 80px;
+    }
+
+    button {
+        font-size: 20px;
+        padding: 12px 24px;
+        cursor: pointer;
+    }
+
+    #now {
+        font-size: 24px;
+        margin-top: 20px;
+    }
+
+    #countdown {
+        font-size: 38px;
+        color: gold;
+        margin-top: 10px;
+    }
+
+    #fade-text {
+        font-size: 36px;
+        color: gold;
+        opacity: 1;
+        transition: opacity 1.5s;
+        margin-top: 40px;
+    }
+
+    #name {
+        margin-top: 20px;
+        font-size: 24px;
+        color: #ccc;
+    }
+
+    #ended {
+        display: none;
+        font-size: 28px;
+        color: gray;
+        margin-top: 40px;
+    }
+</style>
+</head>
+
+<body>
+
+
+<audio id="music-before" src="before.mp3" loop></audio>
+<audio id="music-after" src="after.mp3" loop></audio>
+
+
+<button id="startBtn">Bắt đầu</button>
+
+<div id="fade-text"></div>
+<div id="name">— Nguyễn Minh Quang 2010 —</div>
+
+<div id="now"></div>
+<div id="countdown"></div>
+
+<div id="ended">Sự kiện đã kết thúc</div>
+
+<script>
+
+const startNewYear = new Date("2026-01-01T00:00:00");
+const endNewYear   = new Date("2026-01-04T00:00:00");
+
+
+const beforeWishes = [
+    "Chỉ đêm nay nữa thôi năm 2026 sẽ tới",
+    "Mong bạn bỏ lại muộn phiền ở năm 2025",
+    "Và quất một cái xuất sắc trong năm học",
+    "Chúc bạn luôn đẹp trai, xinh gái nhaaaa",
+    "Hehehehehehehe"
+];
+
+/* ✏️ CÂU CHÚC SAU 0H (SỬA Ở ĐÂY) */
+const afterWishes = [
+    "🎉 CHÚC MỪNG NĂM MỚI 2026 🎉",
+    "Năm mới chúc bạn thêm đẹp trai, xinh gái",
+    "Nhận thật nhiều điều may mắn",
+    "Và tiến gần hơn tới ước mơ của mình nhaaaa",
+    "Hehehehehehehe – năm mới vui vẻ!"
+];
+
+let currentWishes = beforeWishes;
+let wishIndex = 0;
+let wishTimer = null;
+let started = false;
+
+const musicBefore = document.getElementById("music-before");
+const musicAfter  = document.getElementById("music-after");
+
+
+document.getElementById("startBtn").onclick = () => {
+    started = true;
+    document.getElementById("startBtn").style.display = "none";
+    update();
+};
+
+function startWishAnimation() {
+    const text = document.getElementById("fade-text");
+    text.innerText = currentWishes[wishIndex];
+
+    if (wishTimer) clearInterval(wishTimer);
+
+    wishTimer = setInterval(() => {
+        text.style.opacity = 0;
+        setTimeout(() => {
+            wishIndex = (wishIndex + 1) % currentWishes.length;
+            text.innerText = currentWishes[wishIndex];
+            text.style.opacity = 1;
+        }, 1500);
+    }, 4000);
+}
+
+
+function update() {
+    if (!started) return;
+
+    const now = new Date();
+
+
+    if (now >= endNewYear) {
+        musicBefore.pause();
+        musicAfter.pause();
+        document.getElementById("now").style.display = "none";
+        document.getElementById("countdown").style.display = "none";
+        document.getElementById("fade-text").innerText = "";
+        document.getElementById("ended").style.display = "block";
+        if (wishTimer) clearInterval(wishTimer);
+        return;
+    }
+
+
+    if (now >= startNewYear) {
+        musicBefore.pause();
+        musicAfter.play().catch(()=>{});
+
+        if (currentWishes !== afterWishes) {
+            currentWishes = afterWishes;
+            wishIndex = 0;
+            startWishAnimation();
         }
 
-        setInterval(update, 1000);
-        update();
-    </script>
+        document.getElementById("now").style.display = "none";
+        document.getElementById("countdown").style.display = "none";
+        return;
+    }
+
+    musicAfter.pause();
+    musicBefore.play().catch(()=>{});
+
+    document.getElementById("now").innerText =
+        "Bây giờ là: " +
+        now.toLocaleTimeString("vi-VN") +
+        " | " +
+        now.toLocaleDateString("vi-VN");
+
+    const diff = startNewYear - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    document.getElementById("countdown").innerText =
+        `${h} giờ ${m} phút ${s} giây`;
+
+    if (!wishTimer) startWishAnimation();
+}
+
+setInterval(update, 1000);
+</script>
 
 </body>
 </html>
