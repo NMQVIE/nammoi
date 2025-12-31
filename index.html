@@ -57,11 +57,11 @@
 
 <body>
 
-<!-- 🔊 NHẠC -->
+
 <audio id="music-before" src="before.mp3" loop></audio>
 <audio id="music-after" src="after.mp3" loop></audio>
 
-<!-- ▶ NÚT BẮT ĐẦU -->
+
 <button id="startBtn">▶ Bắt đầu</button>
 
 <div id="fade-text"></div>
@@ -73,11 +73,11 @@
 <div id="ended">Sự kiện đã kết thúc</div>
 
 <script>
-/* ⏰ MỐC THỜI GIAN */
+
 const startNewYear = new Date("2026-01-01T00:00:00");
 const endNewYear   = new Date("2026-01-04T00:00:00");
 
-/* ✏️ CÂU CHÚC TRƯỚC 0H (SỬA Ở ĐÂY) */
+
 const beforeWishes = [
     "Chỉ đêm nay nữa thôi năm 2026 sẽ tới",
     "Mong bạn bỏ lại muộn phiền ở năm 2025",
@@ -86,7 +86,7 @@ const beforeWishes = [
     "Hehehehehehehe"
 ];
 
-/* ✏️ CÂU CHÚC SAU 0H (SỬA Ở ĐÂY) */
+
 const afterWishes = [
     "🎉 CHÚC MỪNG NĂM MỚI 2026 🎉",
     "Năm mới chúc bạn thêm đẹp trai, xinh gái",
@@ -184,3 +184,4 @@ function update() {
 
 setInterval(update, 1000);
 </script>
+
